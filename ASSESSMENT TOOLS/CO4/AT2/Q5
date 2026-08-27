@@ -1,0 +1,26 @@
+import tensorflow as tf
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras import layers, Model
+
+cnn = MobileNetV2(weights="imagenet",
+                   include_top=False,
+                   pooling="avg")
+cnn.trainable = False
+
+video = layers.Input((10, 224, 224, 3))
+features = layers.TimeDistributed(cnn)(video)
+encoded = layers.LSTM(256)(features)
+
+x = layers.RepeatVector(10)(encoded)
+x = layers.LSTM(256, return_sequences=True)(x)
+output = layers.TimeDistributed(
+    layers.Dense(5000, activation="softmax")
+)(x)
+
+model = Model(video, output)
+
+model.compile(optimizer="adam",
+              loss="sparse_categorical_crossentropy",
+              metrics=["accuracy"])
+
+model.summary()
