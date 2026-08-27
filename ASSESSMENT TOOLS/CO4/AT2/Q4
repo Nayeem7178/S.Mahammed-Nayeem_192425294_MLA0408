@@ -1,0 +1,18 @@
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+
+X = np.random.rand(100, 20, 1)
+y = np.random.rand(100, 1)
+
+model = Sequential([
+    LSTM(64, input_shape=(20,1)),
+    Dense(32, activation="relu"),
+    Dense(1)
+])
+
+model.compile(optimizer="adam", loss="mse")
+model.fit(X, y, epochs=10, batch_size=16)
+
+pred = model.predict(X[:5])
+print(pred)
