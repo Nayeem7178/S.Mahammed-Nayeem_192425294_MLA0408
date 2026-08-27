@@ -1,0 +1,18 @@
+import tensorflow as tf
+from tensorflow.keras.applications import DenseNet121
+from tensorflow.keras import layers, Model
+
+base = DenseNet121(weights="imagenet", include_top=False,
+                   input_shape=(224,224,3))
+base.trainable = False
+
+x = layers.GlobalAveragePooling2D()(base.output)
+x = layers.Dense(128, activation="relu")(x)
+out = layers.Dense(5, activation="softmax")(x)
+
+model = Model(base.input, out)
+model.compile(optimizer="adam",
+              loss="sparse_categorical_crossentropy",
+              metrics=["accuracy"])
+
+model.summary()
